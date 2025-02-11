@@ -1,3 +1,4 @@
+const NODE_ENV = require("../../common/constants/env.enum");
 const authService = require("./auth.service");
 const autoBind = require("auto-bind")
 
@@ -29,7 +30,10 @@ class AuthController {
         try {
             const {mobile,code}=req.body
             const token = await this.#service.checkOTP(mobile,code)
-            res.status(200).json({token})
+            res.cookie("access_token",token,{
+                httpOnly:true,
+                secret:process.env === NODE_ENV.production
+            }).status(200).json({token})
         } catch (error) {
             next(error)
         }
